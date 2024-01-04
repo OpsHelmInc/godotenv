@@ -1,4 +1,4 @@
-# GoDotEnv ![CI](https://github.com/joho/godotenv/workflows/CI/badge.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/joho/godotenv)](https://goreportcard.com/report/github.com/joho/godotenv)
+# GoDotEnv ![CI](https://github.com/OpsHelmInc/godotenv/workflows/CI/badge.svg)
 
 A Go (golang) port of the Ruby dotenv project (which loads env vars from a .env file)
 
@@ -17,12 +17,12 @@ There is test coverage and CI for both linuxish and windows environments, but I 
 As a library
 
 ```shell
-go get github.com/joho/godotenv
+go get github.com/OpsHelmInc/godotenv
 ```
 
 or if you want to use it as a bin command
 ```shell
-go get github.com/joho/godotenv/cmd/godotenv
+go get github.com/OpsHelmInc/godotenv/cmd/godotenv
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ Then in your Go app you can do something like
 package main
 
 import (
-    "github.com/joho/godotenv"
+    "github.com/OpsHelmInc/godotenv"
     "log"
     "os"
 )
@@ -61,7 +61,7 @@ func main() {
 If you're even lazier than that, you can just take advantage of the autoload package which will read in `.env` on import
 
 ```go
-import _ "github.com/joho/godotenv/autoload"
+import _ "github.com/OpsHelmInc/godotenv/autoload"
 ```
 
 While `.env` in the project root is the default, you don't have to be constrained, both examples below are 100% legit
@@ -177,11 +177,8 @@ Contributions are most welcome! The parser itself is pretty stupidly naive and I
 
 Releases should follow [Semver](http://semver.org/) though the first couple of releases are `v1` and `v1.1`.
 
-Use [annotated tags for all releases](https://github.com/joho/godotenv/issues/30). Example `git tag -a v1.2.1`
+Use [annotated tags for all releases](https://github.com/OpsHelmInc/godotenv/issues/30). Example `git tag -a v1.2.1`
 
-## CI
-
-Linux: [![Build Status](https://travis-ci.org/joho/godotenv.svg?branch=master)](https://travis-ci.org/joho/godotenv) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/9v40vnfvvgde64u4)](https://ci.appveyor.com/project/joho/godotenv)
 
 ## Who?
 

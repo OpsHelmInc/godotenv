@@ -4,10 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
-
 	"strings"
 
-	"github.com/joho/godotenv"
+	"github.com/OpsHelmInc/godotenv"
 )
 
 func main() {
