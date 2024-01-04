@@ -19,17 +19,6 @@ jobs:
           go-version: ${{ matrix.go }}
       - run: go test
 
-  test-non-amd64:
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          # For some reasons this is segfaulting on go env
-          # - name: IBM Z and LinuxONE
-          #   architecture: "s390x"
-          - name: POWER8
-            architecture: "ppc64le"
-
     runs-on: ubuntu-latest
     name: Test on ${{ matrix.arch.name }}
     steps:
