@@ -268,7 +268,6 @@ func TestExpanding(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestActualEnvVarsAreLeftAlone(t *testing.T) {
@@ -447,7 +446,6 @@ func TestWrite(t *testing.T) {
 	writeAndCompare("foo=bar\nbaz=buzz", "baz=\"buzz\"\nfoo=\"bar\"")
 	// integers should not be quoted
 	writeAndCompare(`key="10"`, `key=10`)
-
 }
 
 func TestRoundtrip(t *testing.T) {
@@ -469,6 +467,5 @@ func TestRoundtrip(t *testing.T) {
 		if !reflect.DeepEqual(env, roundtripped) {
 			t.Errorf("Expected '%s' to roundtrip as '%v', got '%v' instead", fixtureFilename, env, roundtripped)
 		}
-
 	}
 }
