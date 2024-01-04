@@ -8,8 +8,14 @@ package autoload
 	And bob's your mother's brother
 */
 
-import "github.com/OpsHelmInc/godotenv"
+import (
+	"log"
+
+	"github.com/OpsHelmInc/godotenv"
+)
 
 func init() {
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Printf("error loading environment file: %v", err)
+	}
 }

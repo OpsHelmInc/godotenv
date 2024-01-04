@@ -2,6 +2,7 @@ package godotenv
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -9,9 +10,11 @@ import (
 	"testing"
 )
 
-var noopPresets = make(map[string]string)
+var noopPresets = make(map[string]string) //nolint:gochecknoglobals // just for tests
+const plainFixture = "fixtures/plain.env"
 
 func parseAndCompare(t *testing.T, rawEnvLine string, expectedKey string, expectedValue string) {
+	t.Helper()
 	key, value, _ := parseLine(rawEnvLine, noopPresets)
 	if key != expectedKey || value != expectedValue {
 		t.Errorf("Expected '%v' to parse as '%v' => '%v', got '%v' => '%v' instead", rawEnvLine, expectedKey, expectedValue, key, value)
@@ -19,6 +22,7 @@ func parseAndCompare(t *testing.T, rawEnvLine string, expectedKey string, expect
 }
 
 func loadEnvAndCompareValues(t *testing.T, loader func(files ...string) error, envFileName string, expectedValues map[string]string, presets map[string]string) {
+	t.Helper()
 	// first up, clear the env
 	os.Clearenv()
 
@@ -42,16 +46,16 @@ func loadEnvAndCompareValues(t *testing.T, loader func(files ...string) error, e
 
 func TestLoadWithNoArgsLoadsDotEnv(t *testing.T) {
 	err := Load()
-	pathError := err.(*os.PathError)
-	if pathError == nil || pathError.Op != "open" || pathError.Path != ".env" {
+	var pathError *os.PathError
+	if err == nil || (errors.As(err, &pathError) && (pathError.Op != "open" || pathError.Path != ".env")) {
 		t.Errorf("Didn't try and open .env by default")
 	}
 }
 
 func TestOverloadWithNoArgsOverloadsDotEnv(t *testing.T) {
 	err := Overload()
-	pathError := err.(*os.PathError)
-	if pathError == nil || pathError.Op != "open" || pathError.Path != ".env" {
+	var pathError *os.PathError
+	if err == nil || (errors.As(err, &pathError) && (pathError.Op != "open" || pathError.Path != ".env")) {
 		t.Errorf("Didn't try and open .env by default")
 	}
 }
@@ -71,7 +75,7 @@ func TestOverloadFileNotFound(t *testing.T) {
 }
 
 func TestReadPlainEnv(t *testing.T) {
-	envFileName := "fixtures/plain.env"
+	envFileName := plainFixture
 	expectedValues := map[string]string{
 		"OPTION_A": "1",
 		"OPTION_B": "2",
@@ -116,7 +120,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestLoadDoesNotOverride(t *testing.T) {
-	envFileName := "fixtures/plain.env"
+	envFileName := plainFixture
 
 	// ensure NO overload
 	presets := map[string]string{
@@ -132,7 +136,7 @@ func TestLoadDoesNotOverride(t *testing.T) {
 }
 
 func TestOveroadDoesOverride(t *testing.T) {
-	envFileName := "fixtures/plain.env"
+	envFileName := plainFixture
 
 	// ensure NO overload
 	presets := map[string]string{
@@ -146,7 +150,7 @@ func TestOveroadDoesOverride(t *testing.T) {
 }
 
 func TestLoadPlainEnv(t *testing.T) {
-	envFileName := "fixtures/plain.env"
+	envFileName := plainFixture
 	expectedValues := map[string]string{
 		"OPTION_A": "1",
 		"OPTION_B": "2",
@@ -273,7 +277,7 @@ func TestExpanding(t *testing.T) {
 func TestActualEnvVarsAreLeftAlone(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("OPTION_A", "actualenv")
-	_ = Load("fixtures/plain.env")
+	_ = Load(plainFixture)
 
 	if os.Getenv("OPTION_A") != "actualenv" {
 		t.Error("An ENV var set earlier was overwritten")
@@ -303,7 +307,7 @@ func TestParsing(t *testing.T) {
 	// parses yaml style options
 	parseAndCompare(t, "OPTION_A: 1", "OPTION_A", "1")
 
-	//parses yaml values with equal signs
+	// parses yaml values with equal signs
 	parseAndCompare(t, "OPTION_A: Foo=bar", "OPTION_A", "Foo=bar")
 
 	// parses non-yaml options with colons
@@ -352,7 +356,7 @@ func TestParsing(t *testing.T) {
 	parseAndCompare(t, `FOO="ba#r"`, "FOO", "ba#r")
 	parseAndCompare(t, "FOO='ba#r'", "FOO", "ba#r")
 
-	//newlines and backslashes should be escaped
+	// newlines and backslashes should be escaped
 	parseAndCompare(t, `FOO="bar\n\ b\az"`, "FOO", "bar\n baz")
 	parseAndCompare(t, `FOO="bar\\\n\ b\az"`, "FOO", "bar\\\n baz")
 	parseAndCompare(t, `FOO="bar\\r\ b\az"`, "FOO", "bar\\r baz")
@@ -431,14 +435,14 @@ func TestWrite(t *testing.T) {
 			t.Errorf("Expected '%v' (%v) to write as '%v', got '%v' instead.", env, envMap, expected, actual)
 		}
 	}
-	//just test some single lines to show the general idea
-	//TestRoundtrip makes most of the good assertions
+	// just test some single lines to show the general idea
+	// TestRoundtrip makes most of the good assertions
 
-	//values are always double-quoted
+	// values are always double-quoted
 	writeAndCompare(`key=value`, `key="value"`)
-	//double-quotes are escaped
+	// double-quotes are escaped
 	writeAndCompare(`key=va"lu"e`, `key="va\"lu\"e"`)
-	//but single quotes are left alone
+	// but single quotes are left alone
 	writeAndCompare(`key=va'lu'e`, `key="va'lu'e"`)
 	// newlines, backslashes, and some other special chars are escaped
 	writeAndCompare(`foo="\n\r\\r!"`, `foo="\n\r\\r\!"`)

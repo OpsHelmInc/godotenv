@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -137,7 +138,9 @@ func Unmarshal(str string) (envMap map[string]string, err error) {
 // If you want more fine grained control over your command it's recommended
 // that you use `Load()` or `Read()` and the `os/exec` package yourself.
 func Exec(filenames []string, cmd string, cmdArgs []string) error {
-	Load(filenames...)
+	if err := Load(filenames...); err != nil {
+		log.Printf("error loading environment files: %v", err)
+	}
 
 	command := exec.Command(cmd, cmdArgs...)
 	command.Stdin = os.Stdin
@@ -161,7 +164,7 @@ func Write(envMap map[string]string, filename string) error {
 	if err != nil {
 		return err
 	}
-	file.Sync()
+	err = file.Sync()
 	return err
 }
 
@@ -259,7 +262,7 @@ func parseLine(line string, envMap map[string]string) (key string, value string,
 	}
 
 	if len(splitString) != 2 {
-		err = errors.New("Can't separate key from value")
+		err = errors.New("can't separate key from value")
 		return
 	}
 
